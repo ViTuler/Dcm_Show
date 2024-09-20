@@ -28,7 +28,7 @@ cornerstoneTools.init({
 
 
 export default {
-    name: "double_shower",
+    name: "home_home",
 
     props: {
         api_url: { required: true, type: String },

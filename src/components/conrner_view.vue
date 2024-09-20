@@ -6,11 +6,11 @@ import { post_data } from '@/utils/vi_tools'
 
 
 export default {
-    name: "cornerstone_img",
+    name: "corner",
 
     props: {
         require_url: { required: true, type: String},
-        series: { required: true, type: String, },
+        patient_id: { required: true, type: String, },
         location: { required: true, type: String, },
         synchronizer: { default() {return []}, type: Array, },
     },
@@ -18,6 +18,7 @@ export default {
     data() {
         return {
             img_info: '', 
+            is_loading: false,
             tool_status: {},
             img_stack: { currentImageIdIndex: 0, imageIds: [], },
             show_info: {
@@ -84,7 +85,7 @@ export default {
     },
 
     async mounted() {
-        let resp = await this.fetch_img(`${this.require_url}/${this.series}`, {type: 'info'})
+        let resp = await this.fetch_img(`${this.require_url}/1`, {type: 'info', patient_id: this.patient_id})
         if (resp.hasOwnProperty('res')) { 
             this.$message.error(resp.res)
             return 
@@ -103,34 +104,46 @@ export default {
 
     methods: {
         async fetch_img(url, url_para) {
-            let resp = await post_data(url, url_para, 15000,)
+            this.is_loading = true
+
+            let resp = await post_data(url, url_para, 60000,)
+
             if (resp.hasOwnProperty('code')) {
+                this.is_loading = false
                 return resp.code == 20000 ? resp.data : resp.res
-            } else { return resp }
+            } else { 
+                this.is_loading = false
+                return resp 
+            }
         },
 
         register_tool(name, status) {
             if (typeof name == 'string') {
+
                 this.tool_status[name] = status
+
             } else if (Array.isArray(name)) {
+
                 name.forEach(item => {
                     this.tool_status[item] = status
                 })
-            }            
+            }
         },
 
         init_tool() {
             let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
             
-            
             // the default tools that won't be controlled
             cornerstoneTools.setToolActiveForElement(img_element, 'ScaleOverlay')
+            
+            
             cornerstoneTools.setToolActiveForElement(img_element, 'StackScrollMouseWheel', {})
+           
+            
+            // cornerstoneTools.setToolActiveForElement(img_element, 'Length', { mouseButtonMask: 1 })
 
-            cornerstoneTools.setToolActiveForElement(img_element, 'Length', { mouseButtonMask: 1 })
-
-            this.register_tool(['Length', ], true)
-            this.register_tool(['Wwwc', 'Zoom', 'Pan'], false)
+            this.register_tool(['StackScroll'], true)
+            this.register_tool(['Length', 'Wwwc', 'Zoom', 'Pan'], false)
         },
 
         async init_img() {
@@ -158,7 +171,9 @@ export default {
 
         filter_show(info) {
             const is_undef = (item) => typeof this.curr_metadata[item.para_name] == 'undefined'
+
             const is_null = (item) => ['', null].includes(this.curr_metadata[item.para_name])
+
             return info.filter(
                 item => !is_undef(item) && !is_null(item)
             )
@@ -166,6 +181,7 @@ export default {
 
         opera_tool(keyword) {       
             let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+
             for (const tool in this.tool_status) {
                 if (this.tool_status[tool]) {
                     cornerstoneTools.setToolPassiveForElement(img_element, tool)
@@ -193,8 +209,15 @@ export default {
 </script>
 
 <template>
-<div :id = "`${$props.location}/cornerstone`" style = "flex-grow: 1; ">
+<div :id = "`${$props.location}/cornerstone`" style = "flex-grow: 1; "
+    class = "corner_item"
+    v-loading = "is_loading"
+    element-loading-text = "拼命加载中"
+    element-loading-spinner = "el-icon-loading"
+    element-loading-background = "rgba(0, 0, 0, 0.8)">
+
     <div style = "margin: 5px 0;">
+        <button @click = "opera_tool('StackScroll')">滚动</button>
         <button @click = "opera_tool('Length')">测距</button>
         <button @click = "opera_tool('Wwwc')">对比</button>
         <button @click = "opera_tool('Zoom')">缩放</button>
@@ -237,6 +260,10 @@ export default {
 </template>
 
 <style lang = "scss" scoped>
+.corner_item {
+    min-height: 500px;
+}
+
 @media screen and (max-width: 600px){
 .shown_info {
     font-size: 10px;
