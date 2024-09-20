@@ -10,7 +10,7 @@ export default {
 
     props: {
         require_url: { required: true, type: String},
-        patient_id: { required: true, type: String, },
+        yizhu_id: { required: true, type: String, },
         location: { required: true, type: String, },
         synchronizer: { default() {return []}, type: Array, },
     },
@@ -85,7 +85,8 @@ export default {
     },
 
     async mounted() {
-        let resp = await this.fetch_img(`${this.require_url}/1`, {type: 'info', patient_id: this.patient_id})
+        let resp = await this.fetch_img(`${this.require_url}/1`, {type: 'info', yizhu_id: this.yizhu_id})
+
         if (resp.hasOwnProperty('res')) { 
             this.$message.error(resp.res)
             return 
@@ -108,13 +109,17 @@ export default {
 
             let resp = await post_data(url, url_para, 60000,)
 
-            if (resp.hasOwnProperty('code')) {
-                this.is_loading = false
-                return resp.code == 20000 ? resp.data : resp.res
-            } else { 
-                this.is_loading = false
-                return resp 
+            console.log(resp)
+
+            
+            if (resp.code == 20000) {
+                delete resp.code; delete resp.res
+            } else {
+                this.$message.alert(resp.res)
             }
+            
+            this.is_loading = false
+            return resp         
         },
 
         register_tool(name, status) {

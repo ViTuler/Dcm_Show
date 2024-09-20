@@ -6,9 +6,10 @@ export default {
     components: { ConrnerView },
     data() {
         return {
-            patient_id: '',
+            yizhu_id: '',
             corner_para: {
-                require_url: 'http://192.168.124.22:9010/dicom',
+                // require_url: 'http://192.168.124.22:9010/dicom',
+                require_url: 'http://192.168.124.53:6080/dicom',
                 location: 'center',
             }
         }
@@ -17,7 +18,7 @@ export default {
     async created() {
         const urlParams = new URLSearchParams(window.location.search)
 
-        this.patient_id = urlParams.get('id')
+        this.yizhu_id = urlParams.get('id')
     },
 
 }
@@ -26,7 +27,7 @@ export default {
 
 <template>
     <div class = "single">
-        <conrner-view :patient_id = "patient_id"
+        <conrner-view :yizhu_id = "yizhu_id"
             :require_url = "corner_para.require_url" 
             :location = "corner_para.location"/>
     </div>
