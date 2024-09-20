@@ -1,5 +1,249 @@
+<script>
+import * as cornerstone from 'cornerstone-core'
+import * as cornerstoneTools from 'cornerstone-tools'
+
+import { post_data } from '@/utils/vi_tools'
+
+
+export default {
+    name: "cornerstone_img",
+
+    props: {
+        require_url: { required: true, type: String},
+        series: { required: true, type: String, },
+        location: { required: true, type: String, },
+        synchronizer: { default() {return []}, type: Array, },
+    },
+
+    data() {
+        return {
+            img_info: '', 
+            tool_status: {},
+            img_stack: { currentImageIdIndex: 0, imageIds: [], },
+            show_info: {
+                left_top: [
+                    { para_name: 'patientName', show_name: 'Name' },
+                    { para_name: 'patientSex', show_name: 'Gender' },
+                    { para_name: 'seriesNumber', show_name: 'Series' },
+                    { para_name: 'images', show_name: 'Image' },
+                ],
+                right_top: [
+                    { para_name: 'institutionName', show_name: '' },
+                    { para_name: 'accessionNumber', show_name: 'Acc' },
+                    { para_name: 'acquisitionDatetime', show_name: 'Acq' },
+                ],
+
+                left_bottom: [
+                    { para_name: 'pixelSpacing', show_name: 'PixelSpacing' },
+                    { para_name: 'windowWidth', show_name: 'WW' },
+                    { para_name: 'kVP', show_name: 'KVP' },
+                    { para_name: 'sliceThickness', show_name: 'Thk' },
+                    
+                ],
+
+                right_bottom: [
+                    { para_name: 'size', show_name: '' },
+                    { para_name: 'modality', show_name: '' },
+                ],
+            },
+
+        }
+    },
+
+    computed: {
+        curr_metadata() {
+          
+            let temper = this.img_stack.currentImageIdIndex
+            temper = this.img_stack.imageIds[temper]
+       
+            if (typeof temper == 'undefined') { return {} }
+            temper = temper.replace(`${this.require_url}/`, '')
+            
+            // add other parameter to metadata
+            
+            return { 
+                images: `${this.img_stack.currentImageIdIndex + 1}/${this.img_stack.imageIds.length}`, 
+                ...this.img_info[temper] 
+            }
+        },
+    },
+
+    watch: {
+        'img_stack': {
+            deep: true,
+            handler(newv) {
+                const percentage = (newv.currentImageIdIndex + 1) / newv.imageIds.length
+                const curr = newv.currentImageIdIndex +1
+
+                this.$emit('img_stack', this.location, {
+                    percentage: percentage, curr: curr, 
+                    total: newv.imageIds.length
+                })
+            },
+        }
+    },
+
+    async mounted() {
+        let resp = await this.fetch_img(`${this.require_url}/${this.series}`, {type: 'info'})
+        if (resp.hasOwnProperty('res')) { 
+            this.$message.error(resp.res)
+            return 
+        }
+       
+        this.img_info = resp
+        
+        this.img_stack.imageIds = Object.keys(resp)
+            .filter(img => img !== 'total_num')
+            .map(img => `${this.require_url}/${img}`)
+
+        
+        cornerstone.metaData.addProvider(this.get_image_metadata.bind(this))
+        this.init_img()
+    },
+
+    methods: {
+        async fetch_img(url, url_para) {
+            let resp = await post_data(url, url_para, 15000,)
+            if (resp.hasOwnProperty('code')) {
+                return resp.code == 20000 ? resp.data : resp.res
+            } else { return resp }
+        },
+
+        register_tool(name, status) {
+            if (typeof name == 'string') {
+                this.tool_status[name] = status
+            } else if (Array.isArray(name)) {
+                name.forEach(item => {
+                    this.tool_status[item] = status
+                })
+            }            
+        },
+
+        init_tool() {
+            let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+            
+            
+            // the default tools that won't be controlled
+            cornerstoneTools.setToolActiveForElement(img_element, 'ScaleOverlay')
+            cornerstoneTools.setToolActiveForElement(img_element, 'StackScrollMouseWheel', {})
+
+            cornerstoneTools.setToolActiveForElement(img_element, 'Length', { mouseButtonMask: 1 })
+
+            this.register_tool(['Length', ], true)
+            this.register_tool(['Wwwc', 'Zoom', 'Pan'], false)
+        },
+
+        async init_img() {
+            let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+            
+            let img_fa = document.getElementById(`${this.location}/cornerstone`)
+            img_element.style.width = `${img_fa.offsetWidth - 10}px`
+            
+            cornerstone.enable(img_element)
+
+            this.img_stack.imageIds.forEach(img => cornerstone.loadAndCacheImage(img))
+
+            cornerstone.loadImage(this.img_stack.imageIds[0]).then((img) => {
+                cornerstone.displayImage(img_element, img)
+
+                // add curr element to all synchronizers
+                this.synchronizer.forEach(syncer => {syncer.add(img_element)})
+
+                cornerstoneTools.addStackStateManager(img_element, ['stack', 'Crosshairs', 'StackScroll', 'Wwwc'])
+                cornerstoneTools.addToolState(img_element, 'stack', this.img_stack)
+            })
+            
+            this.init_tool()
+        },
+
+        filter_show(info) {
+            const is_undef = (item) => typeof this.curr_metadata[item.para_name] == 'undefined'
+            const is_null = (item) => ['', null].includes(this.curr_metadata[item.para_name])
+            return info.filter(
+                item => !is_undef(item) && !is_null(item)
+            )
+        },
+
+        opera_tool(keyword) {       
+            let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+            for (const tool in this.tool_status) {
+                if (this.tool_status[tool]) {
+                    cornerstoneTools.setToolPassiveForElement(img_element, tool)
+                    this.tool_status[tool] = false
+                }
+            }
+
+            if (this.tool_status[keyword]) {
+                cornerstoneTools.setToolPassiveForElement(img_element, keyword,)
+                this.tool_status[keyword] = false
+            } else {
+                cornerstoneTools.setToolActiveForElement(img_element, keyword, { mouseButtonMask: 1 })
+                this.tool_status[keyword] = true
+            }
+        },
+
+        get_image_metadata(keyword, img_id) { 
+            let temper = img_id.replace(`${this.require_url}/`, '')
+            if (Object.keys(this.img_info).includes(temper)) {
+                return this.img_info[temper][keyword] 
+            }
+        },
+    },
+}
+</script>
+
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+<div :id = "`${$props.location}/cornerstone`" style = "flex-grow: 1; ">
+    <div style = "margin: 5px 0;">
+        <button @click = "opera_tool('Length')">测距</button>
+        <button @click = "opera_tool('Wwwc')">对比</button>
+        <button @click = "opera_tool('Zoom')">缩放</button>
+        <button @click = "opera_tool('Pan')">移动</button>
+        <button @click = "opera_tool('DragProbe')">RGB</button>
+        <button @click = "opera_tool('Magnify')">放大镜</button>
+    </div>
+    
+    <div :id = "`${$props.location}/${$props.series}/img_element`" 
+        style = "height: 500px; position: absolute; ">
+        <canvas class = "cornerstone-canvas"/>
+
+        <div v-for = "(item, index) in filter_show(show_info.left_top)" 
+            :key = "item.para_name" class = "shown_info"
+            :style = "{top: `${index * 20 + 5}px`, left: '5px', position: 'absolute', color: 'white',}"> 
+            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+        </div>
+
+        <div v-for = "(item, index) in filter_show(show_info.right_top)" 
+            :key = "item.para_name" class = "shown_info"
+            :style = "{top: `${index * 20 + 5}px`, right: '5px', position: 'absolute', color: 'white',}"> 
+            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+        </div>
+
+        <div v-for = "(item, index) in filter_show(show_info.left_bottom)" 
+            :key = "item.para_name" class = "shown_info"
+            :style = "{bottom: `${index * 20 + 5}px`, left: '5px', position: 'absolute', color: 'white',}"> 
+            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+        </div>
+
+        <div v-for = "(item, index) in filter_show(show_info.right_bottom)" 
+            :key = "item.para_name" class = "shown_info"
+            :style = "{bottom: `${index * 20 + 5}px`, right: '5px', position: 'absolute', color: 'white',}"> 
+            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+        </div>
+        
+    </div>
+    <!-- <div style = "position: absolute;">{{ curr_metadata }}</div> -->
+</div>
 </template>
+
+<style lang = "scss" scoped>
+@media screen and (max-width: 600px){
+.shown_info {
+    font-size: 10px;
+}}
+
+@media screen and (min-width: 600px){
+.shown_info{
+    font-size: 12px;
+}}
+</style>
