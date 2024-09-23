@@ -18,6 +18,7 @@ export default {
     data() {
         return {
             img_info: '', 
+            total_num: 0,
             is_loading: false,
             tool_status: {},
             img_stack: { currentImageIdIndex: 0, imageIds: [], },
@@ -85,50 +86,78 @@ export default {
     },
 
     async mounted() {
-        let resp = await this.fetch_img(`${this.require_url}/1`, {type: 'info', yizhu_id: this.yizhu_id})
+        this.is_loading = true
+        let resp = await this.fetch_img(
+            `${this.require_url}/1`, 
+            {
+                type: 'info', yizhu_id: this.yizhu_id,
+            }
+        )
+        this.is_loading = false
 
         if (resp.hasOwnProperty('res')) { 
             this.$message.error(resp.res)
             return 
         }
-       
+        
+        this.total_num = resp.total_num
+        delete resp.code; delete resp.total_num; delete resp.res
         this.img_info = resp
         
         this.img_stack.imageIds = Object.keys(resp)
-            .filter(img => img !== 'total_num')
             .map(img => `${this.require_url}/${img}`)
 
         
         cornerstone.metaData.addProvider(this.get_image_metadata.bind(this))
         this.init_img()
+
+        this.finish_load_image()
+        // if (this.total_num > 10) {
+        //     this.finish_load_image()
+        // }
+        
     },
 
     methods: {
-        async fetch_img(url, url_para) {
-            this.is_loading = true
+        async finish_load_image() {        
+            const interval_id = setInterval(async () => {
+                let local_cached_num = 0
+                let resp = await this.fetch_img(
+                    `${this.require_url}/1`, 
+                    { type: 'info', yizhu_id: this.yizhu_id, }
+                )
+                
+                local_cached_num = resp.total_num
+                delete resp.total_num
 
+                this.img_info = resp
+                this.img_stack.imageIds = Object.keys(resp)
+                    .map(img => `${this.require_url}/${img}`)
+                
+                this.init_img()
+
+                if (local_cached_num == this.total_num) {
+                    console.log('end')
+                    clearInterval(interval_id)
+                }
+            }, 5000)
+        },
+
+        async fetch_img(url, url_para) {
             let resp = await post_data(url, url_para, 60000,)
 
-            console.log(resp)
-
-            
             if (resp.code == 20000) {
                 delete resp.code; delete resp.res
             } else {
-                this.$message.alert(resp.res)
-            }
-            
-            this.is_loading = false
-            return resp         
+                this.$message.error(resp.res)
+            } return resp         
         },
 
         register_tool(name, status) {
             if (typeof name == 'string') {
-
                 this.tool_status[name] = status
 
             } else if (Array.isArray(name)) {
-
                 name.forEach(item => {
                     this.tool_status[item] = status
                 })
@@ -217,7 +246,7 @@ export default {
 <div :id = "`${$props.location}/cornerstone`" style = "flex-grow: 1; "
     class = "corner_item"
     v-loading = "is_loading"
-    element-loading-text = "拼命加载中"
+    element-loading-text = "拼命加载中..."
     element-loading-spinner = "el-icon-loading"
     element-loading-background = "rgba(0, 0, 0, 0.8)">
 

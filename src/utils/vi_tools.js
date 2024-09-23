@@ -125,6 +125,8 @@ export function format_date(date, key_word, timezone = 'china') {
     }
 }
 
+
+
 export function format_period(date1, date2) {
     // Parse the dates
     let v1 = new Date(date1)
@@ -194,11 +196,10 @@ export function back_server() {
     
     const serverMap = {
         'localhost': 'http://192.168.124.53:6080',
-        '192.168.124.12': 'http://192.168.124.53:6080',
-        // '192.168.124.22': 'http://192.168.3.12:6080',
-        '192.168.124.22': 'http://192.168.124.53:6080',
-        // '192.168.124.22': 'http://120.194.96.67:6080',
-        '120.194.96.67': 'http://120.194.96.67:6080',
+        
+        '192.168.124.22': 'http://192.168.3.12:6080',
+        // '192.168.124.22': 'http://192.168.124.53:6080',
+        
         '192.168.3.12': 'http://192.168.3.12:6080',
         'oa.nsyy.com.cn': 'http://120.194.96.67:6080'
     }

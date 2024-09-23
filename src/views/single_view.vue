@@ -1,5 +1,6 @@
 <script>
 import ConrnerView from '@/components/conrner_view.vue'
+import { back_server } from '@/utils/vi_tools'
 
 
 export default {
@@ -8,8 +9,7 @@ export default {
         return {
             yizhu_id: '',
             corner_para: {
-                // require_url: 'http://192.168.124.22:9010/dicom',
-                require_url: 'http://192.168.124.53:6080/dicom',
+                require_url: `${back_server()}/dicom`,
                 location: 'center',
             }
         }

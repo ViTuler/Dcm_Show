@@ -23,6 +23,7 @@ cornerstoneTools.init({
     globalToolSyncEnabled: true,
 })
 
+
 // add tools herer
 // see example -> https://tools.cornerstonejs.org/examples/
 cornerstoneTools.addTool(cornerstoneTools.LengthTool)
@@ -36,6 +37,7 @@ cornerstoneTools.addTool(cornerstoneTools.StackScrollMouseWheelTool)
 cornerstoneTools.addTool(cornerstoneTools.DragProbeTool)
 cornerstoneTools.addTool(cornerstoneTools.MagnifyTool)
 
+console.log(111111111111)
 export default {
     name: 'corner',
     

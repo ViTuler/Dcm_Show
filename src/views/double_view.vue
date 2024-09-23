@@ -4,7 +4,7 @@ import ConrnerView from '@/components/conrner_view.vue'
 import * as cornerstoneTools from 'cornerstone-tools'
 
 
-import { post_data } from '@/utils/vi_tools'
+import { post_data, back_server } from '@/utils/vi_tools'
 
 
 
@@ -15,8 +15,7 @@ export default {
     
     data() {
         return {
-            // base_url: 'http://192.168.124.22:9010/dicom',
-            base_url: 'http://192.168.124.53:6080/dicom',
+            base_url: `${back_server}/dicom`,
             left_value: '', right_value: '',
             series_list: [
                 {
