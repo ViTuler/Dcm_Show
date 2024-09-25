@@ -1,8 +1,4 @@
 <script>
-import { post_data, back_server, format_date } from '@/utils/vi_tools'
-import { Object } from 'core-js';
-
-
 export default {
     props: {
         report_info: { required: true, type: Object },
@@ -33,7 +29,7 @@ export default {
         <div class = "title">南阳南石医院检查报告单</div>
         <el-divider />
 
-        <el-descriptions class = "basic_info" :column = "4">
+        <el-descriptions class = "basic_info" :column = "3">
             <el-descriptions-item label = "姓名">{{ report_info['姓名'] }}</el-descriptions-item>
 
             <el-descriptions-item label = "性别">{{ report_info['性别'] }}</el-descriptions-item>
@@ -48,11 +44,11 @@ export default {
 
             <el-descriptions-item label = "门诊号">{{ report_info['门诊号'] }}</el-descriptions-item>
 
-            <el-descriptions-item label = "检查项目">{{ report_info['检查项目'] }}</el-descriptions-item>
+            <el-descriptions-item label = "检查项目" :span = "2">{{ report_info['检查项目'] }}</el-descriptions-item>
 
-            <el-descriptions-item label = "检查日期" :span = "2">{{ report_info['检查日期'] }}</el-descriptions-item>
+            <el-descriptions-item label = "检查日期" :span = "3">{{ report_info['检查日期'] }}</el-descriptions-item>
 
-            <el-descriptions-item label = "报告时间" :span = "2">{{ report_info['报告时间'] }}</el-descriptions-item>
+            <el-descriptions-item label = "报告时间" :span = "3">{{ report_info['报告时间'] }}</el-descriptions-item>
 
         </el-descriptions><el-divider />
 
@@ -86,13 +82,16 @@ export default {
         margin: 10px 20px;
 
         .title {
-            margin: 5px auto; width: 40vw; text-align: center;
+            margin: 20px auto; width: 60vw; text-align: center;
+            font-weight: bold; font-size: 20px;
         }
 
         .basic_info {
+            
             div { margin: 4px 0; }
             .el-descriptions-item.el-descriptions-item__cell {
                 padding-bottom: 0px;
+                font-size: 14px;
             }
         }
 
