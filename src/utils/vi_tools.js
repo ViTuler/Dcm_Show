@@ -23,7 +23,7 @@ export async function post_data(url, json_data, timeout = 10000, header = {}) {
             return resp
         } else {
             console.log('Not 200 status', response)
-            return response.json()
+            return response
         }
     } catch (error) {
         if (error.name === 'AbortError') {
@@ -197,8 +197,8 @@ export function back_server() {
     const serverMap = {
         'localhost': 'http://192.168.124.53:6080',
         
-        '192.168.124.22': 'http://192.168.3.12:6080',
-        // '192.168.124.22': 'http://192.168.124.53:6080',
+        // '192.168.124.22': 'http://192.168.3.12:6080',
+        '192.168.124.22': 'http://192.168.124.53:6080',
         
         '192.168.3.12': 'http://192.168.3.12:6080',
         'oa.nsyy.com.cn': 'http://120.194.96.67:6080'

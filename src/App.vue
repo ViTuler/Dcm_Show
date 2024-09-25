@@ -37,7 +37,8 @@ cornerstoneTools.addTool(cornerstoneTools.StackScrollMouseWheelTool)
 cornerstoneTools.addTool(cornerstoneTools.DragProbeTool)
 cornerstoneTools.addTool(cornerstoneTools.MagnifyTool)
 
-console.log(111111111111)
+console.log('Finished Initialization')
+
 export default {
     name: 'corner',
     

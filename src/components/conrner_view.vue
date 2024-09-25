@@ -9,8 +9,8 @@ export default {
     name: "corner",
 
     props: {
-        require_url: { required: true, type: String},
-        yizhu_id: { required: true, type: String, },
+        require_url: { required: true, type: String },
+        dcm_path: { required: true, type: String, },
         location: { required: true, type: String, },
         synchronizer: { default() {return []}, type: Array, },
     },
@@ -90,7 +90,7 @@ export default {
         let resp = await this.fetch_img(
             `${this.require_url}/1`, 
             {
-                type: 'info', yizhu_id: this.yizhu_id,
+                type: 'info', dcm_path: this.dcm_path,
             }
         )
         this.is_loading = false
@@ -124,7 +124,7 @@ export default {
                 let local_cached_num = 0
                 let resp = await this.fetch_img(
                     `${this.require_url}/1`, 
-                    { type: 'info', yizhu_id: this.yizhu_id, }
+                    { type: 'info', dcm_path: this.dcm_path, }
                 )
                 
                 local_cached_num = resp.total_num
@@ -137,7 +137,7 @@ export default {
                 this.init_img()
 
                 if (local_cached_num == this.total_num) {
-                    console.log('end')
+                    console.log('Finish Loading Images')
                     clearInterval(interval_id)
                 }
             }, 5000)
@@ -165,7 +165,7 @@ export default {
         },
 
         init_tool() {
-            let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+            const img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
             
             // the default tools that won't be controlled
             cornerstoneTools.setToolActiveForElement(img_element, 'ScaleOverlay')
@@ -181,7 +181,12 @@ export default {
         },
 
         async init_img() {
-            let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+            const img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+
+            if (img_element == null) {
+                console.log('Shown Element is Null')
+                return
+            }
             
             let img_fa = document.getElementById(`${this.location}/cornerstone`)
             img_element.style.width = `${img_fa.offsetWidth - 10}px`
@@ -214,7 +219,7 @@ export default {
         },
 
         opera_tool(keyword) {       
-            let img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
+            const img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
 
             for (const tool in this.tool_status) {
                 if (this.tool_status[tool]) {
