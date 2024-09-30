@@ -19,8 +19,19 @@ export async function post_data(url, json_data, timeout = 10000, header = {}) {
         })
 
         if (response.ok) {
-            let resp = await response.json()
-            return resp
+            const contentType = response.headers.get('Content-Type')
+            let resp
+
+            if (contentType && contentType.includes('application/json')) {
+                resp = await response.json()
+                return resp
+            } else {
+                resp = await response.blob()
+                return {
+                    code: 20000,
+                    data: resp,
+                }
+            }
         } else {
             console.log('Not 200 status', response)
             return response

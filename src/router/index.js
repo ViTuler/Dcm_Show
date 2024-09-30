@@ -20,7 +20,13 @@ const routes = [
         path: '/doubler',
         name: 'doubler',
         component: () => import('../views/double_view.vue'),
-    }
+    },
+
+    {
+        path: '/test_view',
+        name: 'tester',
+        component: () => import('../views/test_view.vue'),
+    },
 ]
 
 const router = new VueRouter({
