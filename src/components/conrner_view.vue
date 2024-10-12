@@ -120,10 +120,10 @@ export default {
                 // const index = Object.keys(this.img_info)[0]
                 // const normal_view = this.img_info[index]
 
-                const defaultView = this.default_view[this.curr_metadata.modality]
-
                 const { compressed_ww, compressed_wl } = newv.name === '正常视窗' 
-                    ? { ...this.compress_windowed(defaultView.width, defaultView.center) } 
+                    ? { ...this.compress_windowed(
+                        this.curr_metadata.windowWidth, this.curr_metadata.windowCenter
+                    ) } 
                     : { ...this.compress_windowed(newv.width, newv.center) }
 
                 this.adjust_para('windowWidth', compressed_ww)
@@ -251,9 +251,12 @@ export default {
             cornerstone.loadImage(this.img_stack.imageIds[0]).then((img) => {
                 const viewport = cornerstone.getDefaultViewportForImage(img_element, img)
                 
-                const default_w = this.default_view[this.curr_metadata.modality]
+                // const default_w = this.default_view[this.curr_metadata.modality]
+                // const { compressed_ww, compressed_wl } = this.compress_windowed(
+                //     default_w.width, default_w.center
+                // )
                 const { compressed_ww, compressed_wl } = this.compress_windowed(
-                    default_w.width, default_w.center
+                    this.curr_metadata.windowWidth, this.curr_metadata.windowCenter
                 )
 
                 if (!this.curr_metadata.imageType.includes('LOCALIZER')) {
@@ -289,7 +292,9 @@ export default {
                     const { compressed_ww, compressed_wl } = 
                         this.curr_view.name != '正常视窗' 
                         ? this.compress_windowed( this.curr_view.width, this.curr_view.center)
-                        : this.compress_windowed( default_w.width, default_w.center)
+                        : this.compress_windowed(
+                            this.curr_metadata.windowWidth, this.curr_metadata.windowCenter
+                        )
 
                     if (!this.curr_metadata.imageType.includes('LOCALIZER')) {
                         viewport.voi.windowWidth = compressed_ww

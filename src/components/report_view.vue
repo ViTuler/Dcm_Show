@@ -107,6 +107,8 @@ export default {
             .el-descriptions-item.el-descriptions-item__cell {
                 padding-bottom: 0px;
             }
+
+            margin-bottom: 10px;
         }
     }
 }
