@@ -29,6 +29,7 @@ export default {
             // control
             curr_show: 'report',
             curr_dcm_path: null,
+            loading: true,
         }
     },
 
@@ -87,12 +88,17 @@ export default {
         </div>
 
         <div v-if = "curr_show == 'dcm'">
-            <el-button @click = "choose_dcm(null)" type = "primary" size = "mini">返回报告</el-button>
+            <div style = "display: flex; align-items: center">
+                <el-button @click = "choose_dcm(null)" type = "primary" size = "mini">返回报告</el-button>
+
+                <div v-if = "loading" class = "load_text"> 校验信息中... </div>
+            </div>
             
-            <conrner-view v-if = "curr_show == 'dcm'"
+            <ConrnerView v-if = "curr_show == 'dcm'"
                 :dcm_path = "curr_dcm_path"
                 :require_url = "corner_para.require_url" 
-                :location = "corner_para.location"/>
+                :location = "corner_para.location"
+                @finish_loading = "loading = false" />
         </div>
     </div>
 </template>
@@ -106,6 +112,9 @@ export default {
             margin: 5px 0;
         }
     }
-    
+
+    .load_text {
+        margin-left: 10px; font-size: 12px; font-weight: bold;
+    }
 }
 </style>

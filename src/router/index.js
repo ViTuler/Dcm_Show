@@ -27,6 +27,12 @@ const routes = [
         name: 'tester',
         component: () => import('../views/test_view.vue'),
     },
+
+    {
+        path: '/direct_show',
+        name: 'direct Test',
+        component: () => import('../views/direct_test.vue'),
+    },
 ]
 
 const router = new VueRouter({
