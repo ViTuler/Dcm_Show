@@ -12,9 +12,23 @@ export default {
         }
     },
 
+    computed: {
+        all_dcm_list() {
+            const original_dcm_list = this.dcm_list.map(dcm => {
+                return {
+                    dcm_path: dcm.dcm_path,
+                    file_name: `(原)${dcm.file_name}`
+                }
+            })
+
+            return [ ...this.dcm_list, ...original_dcm_list, ]
+        },
+    },  
+
     methods: {
-        choose_dcm(dcm_path) {
-            this.$emit('choose_dcm', dcm_path)
+        choose_dcm(dcm) {
+            const is_original = dcm.file_name.includes('(原)')
+            this.$emit('choose_dcm', dcm.dcm_path, is_original)
         },
     }
 
@@ -59,11 +73,14 @@ export default {
 
             <el-descriptions-item label = "诊断意见">{{ report_info['诊断意见'] }}</el-descriptions-item>
 
-            <el-descriptions-item label = "影像报告">
-                <el-button class = "dcm_button" size = "mini"
-                    v-for = "dcm in dcm_list" :key = "dcm.dcm_path" 
-                    @click = "choose_dcm(dcm.dcm_path)" 
-                    type = "primary">{{ dcm.file_name }}</el-button>
+            <el-descriptions-item label = "影像报告" >
+                <div class = "img_desc">
+                    <el-button class = "dcm_button" size = "mini"
+                        v-for = "dcm in all_dcm_list" :key = "dcm.file_name" 
+                        @click = "choose_dcm(dcm)" 
+                        type = "primary">{{ dcm.file_name }}</el-button>
+                </div>
+                
             </el-descriptions-item>
         </el-descriptions><el-divider />
 
@@ -98,9 +115,14 @@ export default {
         .report_info {
             div { margin: 8px 0; }
             min-height: 50vh;
-            .dcm_button {
-                margin: 2px 0;
+
+            .img_desc {
+                display: inline-block;
+                .dcm_button {
+                    margin: 2px 0;
+                }
             }
+            
         }
 
         .report_foot {

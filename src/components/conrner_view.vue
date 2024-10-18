@@ -288,7 +288,7 @@ export default {
                         return 
                     }
 
-                    const default_w = this.default_view[this.curr_metadata.modality]
+                    // const default_w = this.default_view[this.curr_metadata.modality]
                     const { compressed_ww, compressed_wl } = 
                         this.curr_view.name != '正常视窗' 
                         ? this.compress_windowed( this.curr_view.width, this.curr_view.center)
@@ -355,7 +355,7 @@ export default {
         },
 
         updateViewport(event) {
-            console.log(event)
+            // console.log(event)
             this.$forceUpdate()
         },
 

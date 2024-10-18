@@ -1,6 +1,7 @@
 <script>
 import ConrnerView from '@/components/conrner_view.vue'
 import ReportView from '@/components/report_view.vue'
+import ConrnerWado from '@/components/corner_wado.vue'
 
 import { back_server, post_data } from '@/utils/vi_tools'
 
@@ -11,6 +12,7 @@ export default {
     components: { 
         ConrnerView,
         ReportView,
+        ConrnerWado,
     },
 
     data() {
@@ -18,6 +20,7 @@ export default {
             // para
             corner_para: {
                 require_url: `${back_server()}/dicom`,
+                require_org_url: `${back_server()}/dicom/original`,
                 location: 'center',
             },
 
@@ -30,6 +33,7 @@ export default {
             curr_show: 'report',
             curr_dcm_path: null,
             loading: true,
+            show_org: false,
         }
     },
 
@@ -57,7 +61,9 @@ export default {
             this.dcm_list = dcm_paths
         },
 
-        choose_dcm(dcm_path) {
+        choose_dcm(dcm_path, is_original) {
+            this.curr_show = 'dcm'
+            this.show_org = is_original
             this.curr_dcm_path = dcm_path
         },
 
@@ -89,15 +95,22 @@ export default {
 
         <div v-if = "curr_show == 'dcm'">
             <div style = "display: flex; align-items: center">
-                <el-button @click = "choose_dcm(null)" type = "primary" size = "mini">返回报告</el-button>
+                <el-button @click = "choose_dcm(null, null)" type = "primary" size = "mini">返回报告</el-button>
+
+                <el-button @click = "show_org = true" type = "primary" size = "mini" v-if = "!show_org">查看原图</el-button>
 
                 <div v-if = "loading" class = "load_text"> 校验信息中... </div>
             </div>
             
-            <ConrnerView v-if = "curr_show == 'dcm'"
+            <ConrnerView v-if = "!show_org"
                 :dcm_path = "curr_dcm_path"
                 :require_url = "corner_para.require_url" 
                 :location = "corner_para.location"
+                @finish_loading = "loading = false" />
+
+            <ConrnerWado v-else
+                :dcm_path = "curr_dcm_path"
+                :img_id = "`${curr_dcm_path}/image`"
                 @finish_loading = "loading = false" />
         </div>
     </div>

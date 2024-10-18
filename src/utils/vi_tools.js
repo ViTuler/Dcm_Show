@@ -213,7 +213,8 @@ export function back_server() {
         // '192.168.124.22': 'http://192.168.124.22:9010',
         
         '192.168.3.12': 'http://192.168.3.12:6080',
-        'oa.nsyy.com.cn': 'http://120.194.96.67:6080'
+        
+        'oa.nsyy.com.cn': 'http://oa.nsyy.com.cn:6080'
     }
     
     for (let ip of Object.keys(serverMap)) {
