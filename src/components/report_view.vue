@@ -104,7 +104,6 @@ export default {
         }
 
         .basic_info {
-            
             div { margin: 4px 0; }
             .el-descriptions-item.el-descriptions-item__cell {
                 padding-bottom: 0px;
@@ -113,24 +112,22 @@ export default {
         }
 
         .report_info {
-            div { margin: 8px 0; }
             min-height: 50vh;
-
+            div { margin: 8px 0; }
             .img_desc {
                 display: inline-block;
                 .dcm_button {
                     margin: 2px 0;
                 }
             }
-            
         }
 
         .report_foot {
+            margin-bottom: 10px;
+
             .el-descriptions-item.el-descriptions-item__cell {
                 padding-bottom: 0px;
             }
-
-            margin-bottom: 10px;
         }
     }
 }

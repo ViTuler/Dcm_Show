@@ -3,7 +3,6 @@ import * as cornerstone from 'cornerstone-core'
 import * as cornerstoneTools from 'cornerstone-tools'
 
 import { post_data as post, back_server } from '@/utils/vi_tools'
-import { server_list } from '@/utils/constant'
 
 
 export default {
@@ -14,8 +13,7 @@ export default {
 
     data() {
         return {
-            dcm_server: server_list.yt_dicom,
-            back_server: back_server(),
+            server_url: back_server(),
 
             img_stack: { currentImageIdIndex: 0, imageIds: [], },
             img_info: {},
@@ -71,31 +69,40 @@ export default {
 
             if (img_element == null) {
                 return null
-            } return {
+            } 
+            
+            const info = {
                 index: index,
                 ele: cornerstone.getEnabledElement(img_element),
-                metadata: this.img_info,
+                metadata: Object.values(this.img_info)[index],
             }
+
+            info.metadata.images = `${index+1}/${this.img_stack.imageIds.length}`
+            return info
         },
     },
 
     watch: {
         curr_view(newv) {
              if (this.series != 'undefined') {
-                this.adjust_para('windowWidth', newv.width)
-                this.adjust_para('windowCenter', newv.center)
+                this.adjust_para('windowWidth', newv.width || this.curr_iinfo.metadata.windowWidth)
+                this.adjust_para('windowCenter', newv.center || this.curr_iinfo.metadata.windowCenter)
             }
         },
     },
 
     async mounted() {
-        const resp = await post(`${this.dcm_server}/dicom/original/${this.dcm_path}`)
+        let resp = await post(`${this.server_url}/dicom/${this.dcm_path}?ori=1`)
 
         this.$emit('finish_loading')
 
+        if (typeof resp == 'string') {
+            resp = JSON.parse(resp)
+        }
+
         if (resp.code == 20000) {
             let file_list = resp.data.file_list.map(
-                ele => `wadouri:${this.dcm_server}/dicom/original/${ele}`
+                ele => `wadouri:${this.server_url}/dicom/${ele}?ori=1`
             )
 
             this.img_stack.imageIds = file_list
@@ -104,7 +111,7 @@ export default {
         }
 
         cornerstone.metaData.addProvider((key, img_id) => {
-            const img_path = img_id.replace(`wadouri:${this.dcm_server}/`, '')
+            const img_path = img_id.replace(`wadouri:${this.server_url}/`, '')
 
             if (Object.keys(this.img_info).includes(img_path)) {
                 return this.img_info[img_path][key] 
@@ -161,7 +168,8 @@ export default {
         },
 
         async catch_info() {
-            const url = `${this.back_server}/dicom/1`
+            const url = `${this.server_url}/dicom/1`
+            // const url = `http://192.168.3.12:6080/dicom/1`
             const url_para = { type: 'info', dcm_path: this.dcm_path, }
             
             const resp = await post(url, url_para)
@@ -237,31 +245,31 @@ export default {
     </div>
 
     <div :id = "img_id"
-        style = "height: 500px; position: absolute; width: 90%; margin: 5px;">
+        style = "height: 500px; position: absolute; width: 94%; margin: 5px;">
         <canvas class = "cornerstone-canvas" />
 
         <div v-for = "(item, index) in filter_show(show_info.left_top)" 
             :key = "item.para_name" class = "shown_info"
             :style = "{top: `${index * 20 + 5}px`, left: '5px', position: 'absolute', color: 'white',}"> 
-            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+            {{ item.show_name == '' ? `${curr_iinfo.metadata[item.para_name]}` : `${item.show_name}:${curr_iinfo.metadata[item.para_name]}` }}
         </div>
 
         <div v-for = "(item, index) in filter_show(show_info.right_top)" 
             :key = "item.para_name" class = "shown_info"
             :style = "{top: `${index * 20 + 5}px`, right: '5px', position: 'absolute', color: 'white',}"> 
-            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+            {{ item.show_name == '' ? `${curr_iinfo.metadata[item.para_name]}` : `${item.show_name}:${curr_iinfo.metadata[item.para_name]}` }}
         </div>
 
         <div v-for = "(item, index) in filter_show(show_info.left_bottom)" 
             :key = "item.para_name" class = "shown_info"
             :style = "{bottom: `${index * 20 + 5}px`, left: '5px', position: 'absolute', color: 'white',}"> 
-            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+            {{ item.show_name == '' ? `${curr_iinfo.metadata[item.para_name]}` : `${item.show_name}:${curr_iinfo.metadata[item.para_name]}` }}
         </div>
 
         <div v-for = "(item, index) in filter_show(show_info.right_bottom)" 
             :key = "item.para_name" class = "shown_info"
             :style = "{bottom: `${index * 20 + 5}px`, right: '5px', position: 'absolute', color: 'white',}"> 
-            {{ item.show_name == '' ? `${curr_metadata[item.para_name]}` : `${item.show_name}:${curr_metadata[item.para_name]}` }}
+            {{ item.show_name == '' ? `${curr_iinfo.metadata[item.para_name]}` : `${item.show_name}:${curr_iinfo.metadata[item.para_name]}` }}
         </div>
     </div>
 </div>
@@ -270,5 +278,7 @@ export default {
 <style lang="scss">
 .wado_show {
     width: 100vw; flex-grow: 1;
+
+    .shown_info { font-size: 12px; }
 }
 </style>

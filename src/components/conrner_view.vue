@@ -195,10 +195,8 @@ export default {
                     this.$emit('finish_loading')
                 }
             }, 5000)
-
-            
         },
-
+ 
         async fetch_img(url, url_para) {
             let resp = await post_data(url, url_para, 60000,)
 
