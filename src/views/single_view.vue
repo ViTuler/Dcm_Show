@@ -84,6 +84,11 @@ export default {
 
 <template>
     <div class = "single">
+        <!-- <ConrnerWado
+                :dcm_path = "'MR/20241011/1.2.3.4.5.2680727744.19661011.12144'"
+                :img_id = "`test/image`"
+                @finish_loading = "loading = false" /> -->
+
         <div v-if = "curr_show == 'report'">
             <ReportView 
                 :report_info = "report_info" 

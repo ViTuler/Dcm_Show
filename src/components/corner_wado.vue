@@ -121,16 +121,25 @@ export default {
         })
 
         this.init_img()
-        this.catch_info()
+        
     },
 
     methods: {
-        init_img() {
+        async init_img() {
+            await this.catch_info()
+
             const img_ele = document.getElementById(this.img_id)
             cornerstone.enable(img_ele)
-            this.img_stack.imageIds.forEach(img => cornerstone.loadAndCacheImage(img))
 
-            cornerstone.loadImage(this.img_stack.imageIds[0]).then((img) => {
+            // for (let img of this.img_stack.imageIds) {
+            //     await cornerstone.loadAndCacheImage(img)
+            // }
+
+            this.img_stack.imageIds.slice(0, 5).forEach(img => {
+                cornerstone.loadAndCacheImage(img)
+            })
+
+            cornerstone.loadImage(this.img_stack.imageIds[0]).then(async (img) => {
                 cornerstone.displayImage(img_ele, img)
 
                 cornerstoneTools.addStackStateManager(img_ele, ['stack', 'Crosshairs', 'StackScroll', 'Wwwc'])
@@ -141,6 +150,13 @@ export default {
             })
 
             this.init_tool()
+            this.load_img()
+        },
+
+        async load_img() {
+            for (let img of this.img_stack.imageIds) {
+                await cornerstone.loadAndCacheImage(img)
+            }
         },
 
         init_tool() {
