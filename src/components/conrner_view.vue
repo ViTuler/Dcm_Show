@@ -156,7 +156,7 @@ export default {
             .map(img => `${this.require_url}/${img}`)
         
         cornerstone.metaData.addProvider((key, img_id) => {
-            console.log(key)
+            // console.log(key)
             const img_path = img_id.replace(`${this.require_url}/`, '')
             
             if (Object.keys(this.img_info).includes(img_path)) {

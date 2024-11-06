@@ -69,7 +69,7 @@ export default {
 
             if (img_element == null) {
                 return null
-            } 
+            }
             
             const info = {
                 index: index,
@@ -88,6 +88,28 @@ export default {
                 this.adjust_para('windowWidth', newv.width || this.curr_iinfo.metadata.windowWidth)
                 this.adjust_para('windowCenter', newv.center || this.curr_iinfo.metadata.windowCenter)
             }
+        },
+
+        'img_stack.currentImageIdIndex': function(newv) {
+            if (this.curr_view.name != '正常视窗') {
+                return
+            } else {
+                const metadata = Object.values(this.img_info)[newv]
+
+                const img_element = document.getElementById(this.img_id)
+                const element = cornerstone.getEnabledElement(img_element)
+                const view_port = cornerstone.getViewport(element.element)
+
+                view_port.voi = {
+                    windowCenter: metadata.windowCenter,
+                    windowWidth: metadata.windowWidth,
+                }
+
+                // console.log(view_port)
+                cornerstone.setViewport(element.element, view_port)
+                cornerstone.updateImage(element.element)
+            }
+            
         },
     },
 
@@ -154,8 +176,26 @@ export default {
         },
 
         async load_img() {
-            for (let img of this.img_stack.imageIds) {
-                await cornerstone.loadAndCacheImage(img)
+            // for (let img of this.img_stack.imageIds) {
+            //     await cornerstone.loadAndCacheImage(img)
+            // }
+
+            // this.img_stack.imageIds.forEach(img => {
+            //     cornerstone.loadAndCacheImage(img)
+            // })
+
+            const batchSize = 5
+            const imageIds = this.img_stack.imageIds
+
+            const loadBatch = async (batch) => {
+                await Promise.all(
+                    batch.map(img => cornerstone.loadAndCacheImage(img))
+                )
+            }
+
+            for (let i = 0; i < imageIds.length; i += batchSize) {
+                const batch = imageIds.slice(i, i + batchSize)
+                await loadBatch(batch)
             }
         },
 
