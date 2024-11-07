@@ -77,7 +77,14 @@ export default {
                 metadata: Object.values(this.img_info)[index],
             }
 
-            info.metadata.images = `${index+1}/${this.img_stack.imageIds.length}`
+            if (typeof info.metadata != 'undefined') {
+                info.metadata.images = `${index+1}/${this.img_stack.imageIds.length}`
+            } else {
+                info.metadata = {
+                    images: `${index+1}/${this.img_stack.imageIds.length}`
+                }
+            }
+
             return info
         },
     },
@@ -91,6 +98,8 @@ export default {
         },
 
         'img_stack.currentImageIdIndex': function(newv) {
+            // console.log(cornerstone.metaData.get('scalingModule', this.img_id))
+
             if (this.curr_view.name != '正常视窗') {
                 return
             } else {
@@ -101,8 +110,8 @@ export default {
                 const view_port = cornerstone.getViewport(element.element)
 
                 view_port.voi = {
-                    windowCenter: metadata.windowCenter,
-                    windowWidth: metadata.windowWidth,
+                    windowCenter: metadata?.windowCenter || 450,
+                    windowWidth: metadata?.windowWidth || 1500,
                 }
 
                 // console.log(view_port)
@@ -149,6 +158,12 @@ export default {
     methods: {
         async init_img() {
             await this.catch_info()
+
+            if (this.img_stack.imageIds.length != Object.keys(this.img_info).length) {
+                this.$message.warning('未找到部分图像元数据，将重新加载数据')
+                await this.catch_info(true)
+                window.location.reload()
+            }
 
             const img_ele = document.getElementById(this.img_id)
             cornerstone.enable(img_ele)
@@ -223,11 +238,12 @@ export default {
             }
         },
 
-        async catch_info() {
+        async catch_info(need_force) {
             const url = `${this.server_url}/dicom/1`
             // const url = `http://192.168.3.12:6080/dicom/1`
             const url_para = { type: 'info', dcm_path: this.dcm_path, }
-            
+            if (need_force) { url_para.force_new = 1 }
+
             const resp = await post(url, url_para)
             if (resp.code == 20000) {
                 delete resp.code; delete resp.res; delete resp.total_num

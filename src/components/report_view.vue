@@ -117,7 +117,7 @@ export default {
             .img_desc {
                 display: inline-block;
                 .dcm_button {
-                    margin: 2px 0;
+                    margin: 2px .3em;
                 }
             }
         }
