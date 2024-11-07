@@ -104,19 +104,23 @@ export default {
                 return
             } else {
                 const metadata = Object.values(this.img_info)[newv]
-
                 const img_element = document.getElementById(this.img_id)
-                const element = cornerstone.getEnabledElement(img_element)
-                const view_port = cornerstone.getViewport(element.element)
+                const view_port = cornerstone.getViewport(img_element)
 
                 view_port.voi = {
                     windowCenter: metadata?.windowCenter || 450,
                     windowWidth: metadata?.windowWidth || 1500,
                 }
 
-                // console.log(view_port)
-                cornerstone.setViewport(element.element, view_port)
-                cornerstone.updateImage(element.element)
+                const scale = Math.min(
+                    img_element.clientWidth / metadata.columns,
+                    img_element.clientHeight / metadata.rows,
+                )
+
+                view_port.scale = scale
+
+                cornerstone.setViewport(img_element, view_port)
+                cornerstone.updateImage(img_element)
             }
             
         },
@@ -168,10 +172,6 @@ export default {
 
             const img_ele = document.getElementById(this.img_id)
             cornerstone.enable(img_ele)
-
-            // for (let img of this.img_stack.imageIds) {
-            //     await cornerstone.loadAndCacheImage(img)
-            // }
 
             this.img_stack.imageIds.slice(0, 5).forEach(img => {
                 cornerstone.loadAndCacheImage(img)
