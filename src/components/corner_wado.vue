@@ -159,6 +159,7 @@ export default {
         async init_img() {
             await this.catch_info()
 
+            // check whether metadata match the image
             if (this.img_stack.imageIds.length != Object.keys(this.img_info).length) {
                 this.$message.warning('未找到部分图像元数据，将重新加载数据')
                 await this.catch_info(true)
