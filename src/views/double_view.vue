@@ -4,7 +4,7 @@ import ConrnerView from '@/components/conrner_view.vue'
 import * as cornerstoneTools from 'cornerstone-tools'
 
 
-import { post_data } from '@/utils/vi_tools'
+import { post_data, back_server } from '@/utils/vi_tools'
 
 
 
@@ -15,11 +15,11 @@ export default {
     
     data() {
         return {
-            base_url: 'http://192.168.124.22:9010/dicom',
+            base_url: `${back_server}/dicom`,
             left_value: '', right_value: '',
             series_list: [
                 {
-                    show_name: '某人', patient_id: '12345',
+                    show_name: '某人', yizhu_id: '12345',
                 },
             ],
             
@@ -118,7 +118,7 @@ export default {
         },
 
         async fetch_thumbnail(series) {
-            const url_para = { type: 'thumbnail', patient_id: series.patient_id }
+            const url_para = { type: 'thumbnail', yizhu_id: series.yizhu_id }
             const info = await post_data(`${this.base_url}/1`, url_para, 15000)
 
             if (typeof info.data != 'undefined') {
@@ -157,7 +157,7 @@ export default {
             </select>
 
             <ConrnerView :key = "`left-${curr_lefter.show_name}`"
-                :patient_id = "curr_lefter.patient_id" :location = "'left'"
+                :yizhu_id = "curr_lefter.yizhu_id" :location = "'left'"
                 :require_url = "base_url" :synchronizer = "[scroll_synchronizer, wwwc_synchronizer]"
                 @img_stack = "collect_info"  />
         
@@ -174,7 +174,7 @@ export default {
             </select>
 
             <ConrnerView :key = "`right-${curr_righter.show_name}`"
-                :patient_id = "curr_righter.patient_id" :location = "'right'"
+                :yizhu_id = "curr_righter.yizhu_id" :location = "'right'"
                 :require_url = "base_url" :synchronizer = "[scroll_synchronizer, wwwc_synchronizer]"
                 @img_stack = "collect_info" />
         
@@ -186,7 +186,7 @@ export default {
             </div>
         </div>
 
-        <!-- <home-view api_url = "http://192.168.124.22:8086/test" :left_series = "curr_lefter.patient_id" :right_series = "curr_righter.patient_id"/> -->
+        <!-- <home-view api_url = "http://192.168.124.22:8086/test" :left_series = "curr_lefter.yizhu_id" :right_series = "curr_righter.yizhu_id"/> -->
 
     </div>
     
