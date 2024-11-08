@@ -85,9 +85,9 @@ export default {
         </el-descriptions><el-divider />
 
         <el-descriptions class = "report_foot" :column = "2">
-            <el-descriptions-item label = "审核医生">{{ report_info['审核医生'] }}</el-descriptions-item>
-
             <el-descriptions-item label = "报告医生">{{ report_info['报告医生'] }}</el-descriptions-item>
+
+            <el-descriptions-item label = "审核医生">{{ report_info['审核医生'] }}</el-descriptions-item>
         </el-descriptions>
     </div>
 </div>
