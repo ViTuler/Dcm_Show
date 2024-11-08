@@ -19,11 +19,22 @@ export async function post_data(url, json_data, timeout = 10000, header = {}) {
         })
 
         if (response.ok) {
-            let resp = await response.json()
-            return resp
+            const contentType = response.headers.get('Content-Type')
+            let resp
+
+            if (contentType && contentType.includes('application/json')) {
+                resp = await response.json()
+                return resp
+            } else {
+                resp = await response.blob()
+                return {
+                    code: 20000,
+                    data: resp,
+                }
+            }
         } else {
             console.log('Not 200 status', response)
-            return response.json()
+            return response
         }
     } catch (error) {
         if (error.name === 'AbortError') {
@@ -125,6 +136,8 @@ export function format_date(date, key_word, timezone = 'china') {
     }
 }
 
+
+
 export function format_period(date1, date2) {
     // Parse the dates
     let v1 = new Date(date1)
@@ -194,13 +207,15 @@ export function back_server() {
     
     const serverMap = {
         'localhost': 'http://192.168.124.53:6080',
-        '192.168.124.12': 'http://192.168.124.53:6080',
+        
         // '192.168.124.22': 'http://192.168.3.12:6080',
         '192.168.124.22': 'http://192.168.124.53:6080',
-        // '192.168.124.22': 'http://120.194.96.67:6080',
-        '120.194.96.67': 'http://120.194.96.67:6080',
+        // '192.168.124.22': 'http://192.168.124.22:9011',
+        // '192.168.124.22': 'http://oa.nsyy.com.cn:6080',
+        
         '192.168.3.12': 'http://192.168.3.12:6080',
-        'oa.nsyy.com.cn': 'http://120.194.96.67:6080'
+        
+        'oa.nsyy.com.cn': 'http://oa.nsyy.com.cn:6080'
     }
     
     for (let ip of Object.keys(serverMap)) {

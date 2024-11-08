@@ -23,10 +23,12 @@ cornerstoneTools.init({
     globalToolSyncEnabled: true,
 })
 
+
 // add tools herer
 // see example -> https://tools.cornerstonejs.org/examples/
 cornerstoneTools.addTool(cornerstoneTools.LengthTool)
 cornerstoneTools.addTool(cornerstoneTools.WwwcTool)
+cornerstoneTools.addTool(cornerstoneTools.WwwcRegionTool)
 cornerstoneTools.addTool(cornerstoneTools.ZoomTool)
 cornerstoneTools.addTool(cornerstoneTools.PanTool)
 cornerstoneTools.addTool(cornerstoneTools.ScaleOverlayTool)
@@ -35,6 +37,8 @@ cornerstoneTools.addTool(cornerstoneTools.StackScrollMouseWheelTool)
 
 cornerstoneTools.addTool(cornerstoneTools.DragProbeTool)
 cornerstoneTools.addTool(cornerstoneTools.MagnifyTool)
+
+console.log('Finished Initialization')
 
 export default {
     name: 'corner',
@@ -76,21 +80,5 @@ export default {
 
 
 <style lang = "scss">
-.cornerstone_app {
-    display: flex; width: 100%;
-    .cornerstone_fa {
-        display: flex; width: 100%;
-        .cornerstone_button {
-            display: flex; flex-direction: column; margin-right: 20px;
-        }
-    }
-}
 
-@media screen and (max-width: 600px){
-.cornerstone_app {
-    display: flex; flex-direction: column; height: 100%; width: 100%;
-    .cornerstone_fa { 
-        height: 560px; display: block;
-    }
-}}
 </style>

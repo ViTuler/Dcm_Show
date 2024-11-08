@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import single_view from '../views/single_view.vue'
 
 Vue.use(VueRouter)
 
@@ -10,19 +11,32 @@ const routes = [
     //     component: HomeView
     // },
     {
-        path: '/singler',
+        path: '/',
         name: 'corner',
-        component: () => import('../views/single_view.vue')
+        component: single_view,
     },
+
     {
         path: '/doubler',
         name: 'doubler',
         component: () => import('../views/double_view.vue'),
-    }
+    },
+
+    {
+        path: '/test_view',
+        name: 'tester',
+        component: () => import('../views/test_view.vue'),
+    },
+
+    {
+        path: '/direct_show',
+        name: 'direct Test',
+        component: () => import('../views/direct_test.vue'),
+    },
 ]
 
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     base: process.env.BASE_URL,
     routes
 })
