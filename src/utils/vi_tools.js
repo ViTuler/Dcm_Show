@@ -207,15 +207,8 @@ export function back_server() {
     
     const serverMap = {
         'localhost': 'http://192.168.124.53:6080',
-        
-        // '192.168.124.22': 'http://192.168.3.12:6080',
-        '192.168.124.22': 'http://192.168.124.53:6080',
-        // '192.168.124.22': 'http://192.168.124.22:9011',
-        // '192.168.124.22': 'http://oa.nsyy.com.cn:6080',
-        
-        '192.168.3.12': 'http://192.168.3.12:6080',
-        
-        'oa.nsyy.com.cn': 'http://oa.nsyy.com.cn:6080'
+
+
     }
     
     for (let ip of Object.keys(serverMap)) {

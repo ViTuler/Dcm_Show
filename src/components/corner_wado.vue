@@ -241,7 +241,6 @@ export default {
 
         async catch_info(need_force) {
             const url = `${this.server_url}/dicom/1`
-            // const url = `http://192.168.3.12:6080/dicom/1`
             const url_para = { type: 'info', dcm_path: this.dcm_path, }
             if (need_force) { url_para.force_new = 1 }
 

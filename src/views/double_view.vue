@@ -185,9 +185,6 @@ export default {
                     style = "margin-bottom: 10px;">{{ item.show_name }}</button>
             </div>
         </div>
-
-        <!-- <home-view api_url = "http://192.168.124.22:8086/test" :left_series = "curr_lefter.yizhu_id" :right_series = "curr_righter.yizhu_id"/> -->
-
     </div>
     
     
