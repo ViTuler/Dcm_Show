@@ -5,7 +5,6 @@ export default {
     data() {
         return {
             // server_url: back_server(),
-            server_url: "http://192.168.124.22:8087",
             shouma_html: '',
         }
     },

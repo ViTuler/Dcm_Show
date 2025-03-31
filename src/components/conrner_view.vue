@@ -20,6 +20,7 @@ export default {
             img_info: '', 
             total_num: 0,
             is_loading: false,
+            at_first: true,
             tool_status: {},
             img_stack: { currentImageIdIndex: 0, imageIds: [], },
             show_info: {
@@ -94,10 +95,8 @@ export default {
             const index = this.img_stack.currentImageIdIndex
             const img_element = document.getElementById(`${this.location}/${this.series}/img_element`)
 
-            return {
-                index: index,
-                ...cornerstone.getViewport(img_element)
-            }
+            const viewport = cornerstone.getViewport(img_element)
+            return { index: index, ...viewport, }
         },
     },
 
@@ -121,11 +120,11 @@ export default {
                 // const normal_view = this.img_info[index]
 
                 const { compressed_ww, compressed_wl } = newv.name === '正常视窗' 
-                    ? { ...this.compress_windowed(
-                        this.curr_metadata.windowWidth, this.curr_metadata.windowCenter
-                    ) } 
-                    : { ...this.compress_windowed(newv.width, newv.center) }
-
+                    ? { 
+                        compressed_ww: this.view_info.basic_info.width, 
+                        compressed_wl: this.view_info.basic_info.center, 
+                    } : { ...this.compress_windowed(newv.width, newv.center) }
+                
                 this.adjust_para('windowWidth', compressed_ww)
                 this.adjust_para('windowCenter', compressed_wl)
             }
@@ -190,9 +189,9 @@ export default {
 
                 if (local_cached_num == this.total_num) {
                     console.log('Finish Loading Images')
-                    clearInterval(interval_id)
 
                     this.$emit('finish_loading')
+                    clearInterval(interval_id)
                 }
             }, 5000)
         },
@@ -247,22 +246,7 @@ export default {
             this.img_stack.imageIds.forEach(img => cornerstone.loadAndCacheImage(img))
 
             cornerstone.loadImage(this.img_stack.imageIds[0]).then((img) => {
-                const viewport = cornerstone.getDefaultViewportForImage(img_element, img)
-                
-                // const default_w = this.default_view[this.curr_metadata.modality]
-                // const { compressed_ww, compressed_wl } = this.compress_windowed(
-                //     default_w.width, default_w.center
-                // )
-                const { compressed_ww, compressed_wl } = this.compress_windowed(
-                    this.curr_metadata.windowWidth, this.curr_metadata.windowCenter
-                )
-
-                if (!this.curr_metadata.imageType.includes('LOCALIZER')) {
-                    viewport.voi.windowWidth = compressed_ww
-                    viewport.voi.windowCenter = compressed_wl
-                }
-                
-                cornerstone.displayImage(img_element, img, viewport)
+                cornerstone.displayImage(img_element, img,)
 
                 // add curr element to all synchronizers
                 this.synchronizer.forEach(syncer => {syncer.add(img_element)})
@@ -270,6 +254,9 @@ export default {
                 cornerstoneTools.addStackStateManager(img_element, ['stack', 'Crosshairs', 'StackScroll', 'Wwwc'])
                 cornerstoneTools.addToolState(img_element, 'stack', this.img_stack)
 
+                const curr_viewport = cornerstone.getViewport(img_element)
+                this.view_info.basic_info.center = curr_viewport.voi.windowCenter
+                this.view_info.basic_info.width = curr_viewport.voi.windowWidth
             })
 
             this.init_tool()
@@ -279,27 +266,12 @@ export default {
                 const currentImageId = this.img_stack.imageIds[currentImageIndex]
 
                 cornerstone.loadImage(currentImageId).then((img) => {
-                    const viewport = cornerstone.getDefaultViewportForImage(img_element, img)
-
                     // ignore change when using special mode
                     if (this.tool_status.WwwcRegion == true || this.tool_status.Wwwc == true) { 
                         return 
                     }
 
-                    // const default_w = this.default_view[this.curr_metadata.modality]
-                    const { compressed_ww, compressed_wl } = 
-                        this.curr_view.name != '正常视窗' 
-                        ? this.compress_windowed( this.curr_view.width, this.curr_view.center)
-                        : this.compress_windowed(
-                            this.curr_metadata.windowWidth, this.curr_metadata.windowCenter
-                        )
-
-                    if (!this.curr_metadata.imageType.includes('LOCALIZER')) {
-                        viewport.voi.windowWidth = compressed_ww
-                        viewport.voi.windowCenter = compressed_wl
-                    }
-
-                    cornerstone.displayImage(img_element, img, viewport)
+                    cornerstone.displayImage(img_element, img,)
                 })
                 
             })

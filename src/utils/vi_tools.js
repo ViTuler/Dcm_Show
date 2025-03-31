@@ -206,8 +206,9 @@ export function back_server() {
     const hostname = location.hostname
     
     const serverMap = {
-        'localhost': 'http://192.168.124.53:6080',
-
+        '192.168.124.22': 'http://192.168.124.53:6080',
+        // '192.168.124.22': 'http://oa.nsyy.com.cn:6080',
+        // '192.168.124.22': 'http://192.168.3.12:6080',
 
     }
     

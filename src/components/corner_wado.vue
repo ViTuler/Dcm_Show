@@ -167,7 +167,6 @@ export default {
             if (this.img_stack.imageIds.length != Object.keys(this.img_info).length) {
                 this.$message.warning('未找到部分图像元数据，将重新加载数据')
                 await this.catch_info(true)
-                window.location.reload()
             }
 
             const img_ele = document.getElementById(this.img_id)
@@ -205,7 +204,9 @@ export default {
 
             const loadBatch = async (batch) => {
                 await Promise.all(
-                    batch.map(img => cornerstone.loadAndCacheImage(img))
+                    batch.map(img => cornerstone.loadAndCacheImage(img).catch(err => {
+                        console.error(`Error loading image: ${img}`, err)
+                    }))
                 )
             }
 
