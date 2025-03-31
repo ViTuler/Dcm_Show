@@ -40,7 +40,10 @@ export default {
 <template>
 <div :class = "`${report_id} report`">
     <div>
-        <div class = "title">南阳官庄工区南石康复医院检查报告单</div>
+        <div class = "title">
+            南阳官庄工区南石康复医院
+            <br>检查报告单
+        </div>
         <el-divider />
 
         <el-descriptions class = "basic_info" :column = "3">
