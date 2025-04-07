@@ -198,7 +198,8 @@ export var show_memory_usage = function() {
     var mem = process.memoryUsage()
     var format = function(bytes) {
         return (bytes/1024/1024).toFixed(2)+'MB'
-    };
+    }
+
     console.log('Process1: heapTotal '+format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss))
 }
 
@@ -210,6 +211,8 @@ export function back_server() {
         // '192.168.124.22': 'http://oa.nsyy.com.cn:6080',
         // '192.168.124.22': 'http://192.168.3.12:6080',
 
+        '192.168.3.12': 'http://192.168.3.12:6080',
+        'oa.nsyy.com.cn': 'http://oa.nsyy.com.cn:6080',
     }
     
     for (let ip of Object.keys(serverMap)) {

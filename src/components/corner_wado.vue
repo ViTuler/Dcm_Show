@@ -97,33 +97,32 @@ export default {
             }
         },
 
-        'img_stack.currentImageIdIndex': function(newv) {
-            // console.log(cornerstone.metaData.get('scalingModule', this.img_id))
+        // 'img_stack.currentImageIdIndex': function(newv) {
+        //     // console.log(cornerstone.metaData.get('scalingModule', this.img_id))
 
-            if (this.curr_view.name != '正常视窗') {
-                return
-            } else {
-                const metadata = Object.values(this.img_info)[newv]
-                const img_element = document.getElementById(this.img_id)
-                const view_port = cornerstone.getViewport(img_element)
+        //     if (this.curr_view.name != '正常视窗') {
+        //         return
+        //     } else {
+        //         const metadata = Object.values(this.img_info)[newv]
+        //         const img_element = document.getElementById(this.img_id)
+        //         const view_port = cornerstone.getViewport(img_element)
 
-                view_port.voi = {
-                    windowCenter: metadata?.windowCenter || 450,
-                    windowWidth: metadata?.windowWidth || 1500,
-                }
+        //         view_port.voi = {
+        //             windowCenter: metadata?.windowCenter || 450,
+        //             windowWidth: metadata?.windowWidth || 1500,
+        //         }
 
-                const scale = Math.min(
-                    img_element.clientWidth / metadata.columns,
-                    img_element.clientHeight / metadata.rows,
-                )
+        //         const scale = Math.min(
+        //             img_element.clientWidth / metadata.columns,
+        //             img_element.clientHeight / metadata.rows,
+        //         )
 
-                view_port.scale = scale
+        //         view_port.scale = scale
 
-                cornerstone.setViewport(img_element, view_port)
-                cornerstone.updateImage(img_element)
-            }
-            
-        },
+        //         cornerstone.setViewport(img_element, view_port)
+        //         cornerstone.updateImage(img_element)
+        //     }
+        // },
     },
 
     async mounted() {
